@@ -1,4 +1,4 @@
-from re import I
+
 from tkinter import*
 from ast import Lambda
 import random
@@ -23,8 +23,27 @@ class Field:
         self.cell_coordinates = []
         self.yellow_square = []
         self.click_cell = []
+        self.changed_task_fields_for_check_in_square = [[],[],[],[],[],[],[],[],[]]
+
+    def change_task_field(self):
+        for i in range(len(self.task)):
+            for j in range(len(self.task)):
+                if j <=2 and i<=2:
+                    self.changed_task_fields_for_check_in_square[0].append(self.task[i][j])
+                if  3<=j<=5 and i<=2:
+                    self.changed_task_fields_for_check_in_square[1].append(self.task[i][j])
+                if  6<=j<=8 and i<=2:
+                    self.changed_task_fields_for_check_in_square[2].append(self.task[i][j]) 
+                if j <=2 and i<=2:
+                    self.changed_task_fields_for_check_in_square[0].append(self.task[i][j])   
+        print(self.task)
+        print(self.changed_task_fields_for_check_in_square)
+
+                
+
 
     def made_field(self):
+        self.change_task_field()
         width_of_lines = 1
         summ = 0
         for i in range(10):
@@ -103,8 +122,13 @@ class Field:
         if self.task[cell_coordinates[0]][cell_coordinates[1]] != 0:
            return False
         if num in self.task[cell_coordinates[0]]:
-           canvas.create_text(250, 50, text="WRONG NUMBER!!!", font='Verdana 20', fill = 'red', tag = "del" )
+           canvas.create_text(300, 50, text="WRONG NUMBER!!!", font='Verdana 20', fill = 'red', tag = "del" )
            return False
+        for i in self.task:
+            if i[cell_coordinates[1]]==num:
+                canvas.create_text(300, 50, text="WRONG NUMBER!!!", font='Verdana 20', fill = 'red', tag = "del" )
+                return False
+        
         return True
 class Click:
     def __init__(self):
