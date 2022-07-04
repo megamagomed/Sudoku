@@ -1,5 +1,8 @@
+from re import I
 from tkinter import*
 from ast import Lambda
+import random
+
 
 root =Tk()
 root.title('SUDOKU')
@@ -10,7 +13,6 @@ canvas.create_line(canv_size,5, canv_size, canv_size-5, fill = '#3f8023', width=
 canvas.create_rectangle(5,5, canv_size*2-5, canv_size-5,outline="#3f8023", width=5)
 
 
-
 class Field:
     def __init__(self, task=None):
         self.task = task
@@ -18,9 +20,13 @@ class Field:
         self.cell_size = 50
         self.vertical_rectangle =[]
         self.horizontal_rectangle = []
+        self.cell_coordinates = []
+        self.yellow_square = []
+        self.click_cell = []
+
     def made_field(self):
         width_of_lines = 1
-        
+        summ = 0
         for i in range(10):
             if i==0 or i==3 or i ==6 or i==9:
                 width_of_lines = 5
@@ -28,31 +34,102 @@ class Field:
                 width_of_lines = 1
             canvas.create_line(50, self.cell_size*(i+1)+50, self.field_size + 50, self.cell_size*(i+1)+50, fill='blue', width=width_of_lines)
             canvas.create_line(50+self.cell_size*(i), 100, 50+self.cell_size*(i), self.field_size + 100, fill='blue', width=width_of_lines)
-        
-        for i in range(len(self.task)):
-            for j in range(len(self.task)):
-                if self.task[i][j] !=0:
-                    canvas.create_text(self.cell_size/2+ self.cell_size*j+50, self.cell_size/2+self.cell_size*i+100, text=self.task[i][j], font='Verdana 20', fill = 'green')
+        for i in self.task:
+            summ +=sum(i)
+        if summ == 0:
+            canvas.delete("del")
+        else:
+            for i in range(len(self.task)):
+                for j in range(len(self.task)):
+                    if self.task[i][j] !=0:
+                        text_in_cell = self.task[i][j]
+                        canvas.create_text(self.cell_size/2+ self.cell_size*j+50, self.cell_size/2+self.cell_size*i+100, text=text_in_cell, font='Verdana 20', fill = 'green', tag = "del" )        
+                    
 
     def click_event_field(self, event):
-        cell_coordinates = self.change_coords(event.x, event.y)
-        self.vertical_rectangle.append(canvas.create_rectangle(50+self.cell_size*cell_coordinates[1],100,100+self.cell_size*cell_coordinates[1], 550, outline = 'red', width = 2))
-        self.horizontal_rectangle.append(canvas.create_rectangle(50, 100+self.cell_size*cell_coordinates[0],500, 150+self.cell_size*cell_coordinates[0], outline = 'red',width = 2))
-        if len(self.vertical_rectangle)>1:
-            canvas.delete(self.vertical_rectangle[0])
-            self.vertical_rectangle.pop(0)
-            canvas.delete(self.horizontal_rectangle[0])
-            self.horizontal_rectangle.pop(0)
-        print(self.vertical_rectangle)
+        self.cell_coordinates.append(self.change_coords(event.x, event.y))
+        cell_coordinates = self.cell_coordinates[len(self.cell_coordinates)-1]
+        if 8>=cell_coordinates[0]>=0 and 8>=cell_coordinates[1]>=0:
+            self.draw_yellow_square()
+            self.vertical_rectangle.append(canvas.create_rectangle(50+self.cell_size*cell_coordinates[1],100,100+self.cell_size*cell_coordinates[1], 550, width = 1, fill = 'yellow'))
+            self.horizontal_rectangle.append(canvas.create_rectangle(50, 100+self.cell_size*cell_coordinates[0],500, 150+self.cell_size*cell_coordinates[0], width = 1, fill = 'yellow'))
+            self.click_cell.append(canvas.create_rectangle(50+self.cell_size*cell_coordinates[1],100+self.cell_size*cell_coordinates[0],100+self.cell_size*cell_coordinates[1],150+self.cell_size*cell_coordinates[0], width = 1, fill = 'gray'))
+            if len(self.vertical_rectangle)>1:
+                canvas.delete(self.vertical_rectangle[0])
+                self.vertical_rectangle.pop(0)
+                canvas.delete(self.horizontal_rectangle[0])
+                self.horizontal_rectangle.pop(0)
+                canvas.delete(self.yellow_square[0])
+                self.yellow_square.pop(0)
+                canvas.delete(self.click_cell[0])
+                self.click_cell.pop(0)
+        self.made_field()    
+    def draw_yellow_square(self):
+        
+        cell_coordinates = self.cell_coordinates[len(self.cell_coordinates)-1]
         print(cell_coordinates)
-    
+        if cell_coordinates[0] <=2 and cell_coordinates[1]<=2:
+            self.yellow_square.append(canvas.create_rectangle(50,100,200, 250, width = 1, fill = 'yellow'))
+        if cell_coordinates[0] <=2 and 3<=cell_coordinates[1]<=5:
+            self.yellow_square.append(canvas.create_rectangle(200,100,350, 250, width = 1, fill = 'yellow'))
+        if cell_coordinates[0] <=2 and cell_coordinates[1] >=6:
+            self.yellow_square.append(canvas.create_rectangle(350,100,500, 250, width = 1, fill = 'yellow'))
+        if 3<=cell_coordinates[0] <=5 and cell_coordinates[1]<=2:
+            self.yellow_square.append(canvas.create_rectangle(50,250,200, 400, width = 1, fill = 'yellow'))
+        if 3<=cell_coordinates[0] <=5 and 3<=cell_coordinates[1]<=5:
+            self.yellow_square.append(canvas.create_rectangle(200,250,350, 400, width = 1, fill = 'yellow'))       
+        if 3<=cell_coordinates[0] <=5 and cell_coordinates[1]>=6:
+            self.yellow_square.append(canvas.create_rectangle(350,250,500, 400, width = 1, fill = 'yellow'))
+        if cell_coordinates[0] >=6 and cell_coordinates[1]<=2:
+            self.yellow_square.append(canvas.create_rectangle(50,400,200, 550, width = 1, fill = 'yellow'))  
+        if cell_coordinates[0] >=6 and 3<=cell_coordinates[1]<=5:
+            self.yellow_square.append(canvas.create_rectangle(200,400,350, 550, width = 1, fill = 'yellow'))
+        if cell_coordinates[0] >=6 and cell_coordinates[1]>=6:
+            self.yellow_square.append(canvas.create_rectangle(350,400,500, 550, width = 1, fill = 'yellow'))
+
     def change_coords(self,x,y):
         row = (y-100)//self.cell_size
         column = (x-50)//self.cell_size
         return row,column
+    
+    def write_number_in_cell(self, num):
+        cell_coordinates = self.cell_coordinates[len(self.cell_coordinates)-1]
+        check_value = self.check_entered_value(num)
+        if check_value:
+            canvas.create_text(self.cell_size/2+ self.cell_size*cell_coordinates[1]+50, self.cell_size/2+self.cell_size*cell_coordinates[0]+100, text=num, font='Verdana 20', fill = 'green', tag = "del" )
 
+    def check_entered_value(self, num):
+        cell_coordinates = self.cell_coordinates[len(self.cell_coordinates)-1]
+        if self.task[cell_coordinates[0]][cell_coordinates[1]] != 0:
+           return False
+        if num in self.task[cell_coordinates[0]]:
+           canvas.create_text(250, 50, text="WRONG NUMBER!!!", font='Verdana 20', fill = 'red', tag = "del" )
+           return False
+        return True
+class Click:
+    def __init__(self):
+        self.clear_flag = 0
+        self.field = Field()
+    def click_handler(self, event):
+            random_arg = 0
+            clear_field = Field(spisok_empty)
+            if event == "new game":
+                clear_field.made_field()
+                random_arg = random.randint(0, len(spisok)-1)
+                self.field =  Field((spisok[random_arg]))
+                self.field.made_field()
+                self.clear_flag = 1
 
-spisok = [[1,0,0,0,0,0,0,0,3], 
+            if event == "clear" and self.clear_flag ==1:
+                clear_field.made_field()
+                self.field.made_field()
+            
+            if type(event) == int:
+                self.field.write_number_in_cell(event)
+            
+            canvas.bind('<Button-1>', self.field.click_event_field)    
+
+spisok = [[[1,0,0,0,0,0,0,0,3], 
           [0,0,7,2,6,0,4,8,0], 
           [4,0,0,9,3,5,0,0,6],
           [0,3,0,4,8,0,2,0,0],      
@@ -60,67 +137,78 @@ spisok = [[1,0,0,0,0,0,0,0,3],
           [0,0,6,0,0,0,8,9,0],
           [5,7,8,0,4,0,0,0,2],
           [0,0,0,3,0,0,0,7,0],
-          [2,0,0,0,0,0,0,0,5]]
+          [2,0,0,0,0,0,0,0,5]],
+          [[0,9,0,0,0,5,1,0,0], 
+          [0,0,5,0,8,7,3,0,4], 
+          [4,0,0,1,0,0,5,0,6],
+          [0,0,0,0,0,0,0,6,0],      
+          [0,0,4,5,0,2,7,0,0],
+          [0,3,0,0,0,0,0,0,0],
+          [7,0,9,0,0,4,0,0,1],
+          [3,0,2,9,5,0,6,0,0],
+          [0,0,1,7,0,0,0,2,0]],
+          [[1,0,0,0,0,6,0,5,0], 
+          [0,0,0,0,0,2,0,0,0], 
+          [0,0,0,0,0,0,3,0,2],
+          [0,0,0,0,5,1,0,0,0],      
+          [6,0,7,2,0,0,0,0,0],
+          [0,0,0,0,7,0,0,3,8],
+          [8,0,0,1,0,0,0,0,0],
+          [0,2,0,8,0,4,9,0,7],
+          [3,0,0,0,0,0,0,4,6]],
+          [[0,0,0,9,0,0,0,0,1], 
+          [0,5,0,0,0,0,6,0,0], 
+          [4,0,0,3,0,0,0,0,7],
+          [0,8,0,0,0,5,0,0,0],      
+          [0,0,1,0,0,0,2,0,0],
+          [0,0,0,4,0,0,0,9,0],
+          [7,0,0,0,0,1,0,0,8],
+          [0,0,9,0,0,0,0,3,0],
+          [2,0,0,0,0,7,0,0,0]],
+          [[7,0,0,9,0,0,3,4,0], 
+          [0,5,0,8,0,6,0,0,0], 
+          [0,0,0,0,1,0,0,0,0],
+          [0,6,0,0,0,0,0,8,0],      
+          [1,0,0,0,3,0,0,0,5],
+          [0,0,0,4,0,0,2,0,0],
+          [0,0,0,0,2,0,0,9,0],
+          [0,0,0,0,0,0,7,0,2],
+          [9,0,0,0,7,5,4,0,8]]]
 
-field = Field(spisok)
-field.made_field()
-canvas.bind('<Button-1>', field.click_event_field)
+spisok_empty = [[0,0,0,0,0,0,0,0,0], 
+                [0,0,0,0,0,0,0,0,0], 
+                [0,0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0,0],      
+                [0,0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0,0]]
 
-
-# if len(spisok) !=9:
-#     print('rukogop')
-# for i in range(len(spisok)):
-#     if len(spisok[i]) != 9:
-#         print('rukogop')
-
-# def check_digit(spisok, row, column, arg):
-#     square_row = row // 3
-#     square_column = column // 3
-#     for i in range(square_row*3, square_row*3+3):
-#         for j in range(square_column*3, square_column*3+3):
-#             if arg == spisok[i][j]:
-#                 return False
-    
-#     if arg in spisok[row]:
-#         return False
-
-#     for i in range(len(spisok)):
-#         if spisok[i][column]==arg:
-#             return False
-    
-
-
-
-# print(check_digit(spisok, 5, 0, 2))
-
-# check_digit(spisok, 0, 8, 1)
-# check_digit(spisok, 6, 2, 1)
-
-
-
-btn_new_game = Button(text="New game", background="#2a7098", foreground="white", font=("Arial", 23, "bold"))
+click = Click()
+btn_new_game = Button(text="New game", background="#2a7098", foreground="white", font=("Arial", 23, "bold"), command=lambda: click.click_handler("new game"))
 btn_new_game.place(x=700, y=100,  height=50, width=450, bordermode=INSIDE)
-btn_cancel = Button(text="Cancel", background="#2a7098", foreground="white", font=("Arial", 23, "bold"))
+btn_cancel = Button(text="Cancel", background="#2a7098", foreground="white", font=("Arial", 23, "bold"), command=lambda: click.click_handler("cancel"))
 btn_cancel.place(x=700, y=170,  height=50, width=200, bordermode=INSIDE)
-btn_clear = Button(text="Clear", background="#2a7098", foreground="white", font=("Arial", 23, "bold"))
+btn_clear = Button(text="Clear", background="#2a7098", foreground="white", font=("Arial", 23, "bold"), command=lambda: click.click_handler("clear"))
 btn_clear.place(x=950, y=170,  height=50, width=200, bordermode=INSIDE)
-btn_1 = Button(text="1", background="#20a3df", foreground="white", font=("Arial", 23, "bold"))
+btn_1 = Button(text="1", background="#20a3df", foreground="white", font=("Arial", 23, "bold"), command=lambda: click.click_handler(1))
 btn_1.place(x=700, y=240,  height=90, width=137, bordermode=INSIDE)
-btn_2 = Button(text="2", background="#20a3df", foreground="white", font=("Arial", 23, "bold"))
+btn_2 = Button(text="2", background="#20a3df", foreground="white", font=("Arial", 23, "bold"), command=lambda: click.click_handler(2))
 btn_2.place(x=857, y=240,  height=90, width=137, bordermode=INSIDE)
-btn_3 = Button(text="3", background="#20a3df", foreground="white", font=("Arial", 23, "bold"))
+btn_3 = Button(text="3", background="#20a3df", foreground="white", font=("Arial", 23, "bold"), command=lambda: click.click_handler(3))
 btn_3.place(x=1014, y=240,  height=90, width=137, bordermode=INSIDE)
-btn_4 = Button(text="4", background="#20a3df", foreground="white", font=("Arial", 23, "bold"))
+btn_4 = Button(text="4", background="#20a3df", foreground="white", font=("Arial", 23, "bold"), command=lambda: click.click_handler(4))
 btn_4.place(x=700, y=350,  height=90, width=137, bordermode=INSIDE)
-btn_5 = Button(text="5", background="#20a3df", foreground="white", font=("Arial", 23, "bold"))
+btn_5 = Button(text="5", background="#20a3df", foreground="white", font=("Arial", 23, "bold"), command=lambda: click.click_handler(5))
 btn_5.place(x=857, y=350,  height=90, width=137, bordermode=INSIDE)
-btn_6 = Button(text="6", background="#20a3df", foreground="white", font=("Arial", 23, "bold"))
+btn_6 = Button(text="6", background="#20a3df", foreground="white", font=("Arial", 23, "bold"), command=lambda: click.click_handler(6))
 btn_6.place(x=1014, y=350,  height=90, width=137, bordermode=INSIDE)
-btn_7 = Button(text="7", background="#20a3df", foreground="white", font=("Arial", 23, "bold"))
+btn_7 = Button(text="7", background="#20a3df", foreground="white", font=("Arial", 23, "bold"), command=lambda: click.click_handler(7))
 btn_7.place(x=700, y=460,  height=90, width=137, bordermode=INSIDE)
-btn_8 = Button(text="8", background="#20a3df", foreground="white", font=("Arial", 23, "bold"))
+btn_8 = Button(text="8", background="#20a3df", foreground="white", font=("Arial", 23, "bold"), command=lambda: click.click_handler(8))
 btn_8.place(x=857, y=460,  height=90, width=137, bordermode=INSIDE)
-btn_9 = Button(text="9", background="#20a3df", foreground="white", font=("Arial", 23, "bold"))
+btn_9 = Button(text="9", background="#20a3df", foreground="white", font=("Arial", 23, "bold"), command=lambda: click.click_handler(9))
 btn_9.place(x=1014, y=460,  height=90, width=137, bordermode=INSIDE)
 
 root.mainloop()
