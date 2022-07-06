@@ -24,6 +24,7 @@ class Field:
         self.yellow_square = []
         self.click_cell = []
         self.changed_task_fields_for_check_in_square = [[],[],[],[],[],[],[],[],[]]
+        self.wrong_number = []
 
     def change_task_field(self):
         for i in range(len(self.task)):
@@ -34,14 +35,19 @@ class Field:
                     self.changed_task_fields_for_check_in_square[1].append(self.task[i][j])
                 if  6<=j<=8 and i<=2:
                     self.changed_task_fields_for_check_in_square[2].append(self.task[i][j]) 
-                if j <=2 and i<=2:
-                    self.changed_task_fields_for_check_in_square[0].append(self.task[i][j])   
-        print(self.task)
-        print(self.changed_task_fields_for_check_in_square)
-
+                if j <=2 and 3<=i<=5:
+                    self.changed_task_fields_for_check_in_square[3].append(self.task[i][j])  
+                if 3<=j<=5 and 3<=i<=5:
+                    self.changed_task_fields_for_check_in_square[4].append(self.task[i][j])
+                if 6<=j<=8 and 3<=i<=5:
+                    self.changed_task_fields_for_check_in_square[5].append(self.task[i][j])
+                if j <=2 and 6<=i<=8:
+                    self.changed_task_fields_for_check_in_square[6].append(self.task[i][j])
+                if 3<=j<=5 and 6<=i<=8:
+                    self.changed_task_fields_for_check_in_square[7].append(self.task[i][j]) 
+                if 6<=j<=8 and 6<=i<=8:
+                    self.changed_task_fields_for_check_in_square[8].append(self.task[i][j])          
                 
-
-
     def made_field(self):
         self.change_task_field()
         width_of_lines = 1
@@ -66,6 +72,11 @@ class Field:
                     
 
     def click_event_field(self, event):
+        print(len(self.wrong_number))
+        if len(self.wrong_number)>=1:
+            print('adfasdfdsf')
+            canvas.delete(self.wrong_number[0])
+            self.wrong_number.pop(0)
         self.cell_coordinates.append(self.change_coords(event.x, event.y))
         cell_coordinates = self.cell_coordinates[len(self.cell_coordinates)-1]
         if 8>=cell_coordinates[0]>=0 and 8>=cell_coordinates[1]>=0:
@@ -83,10 +94,10 @@ class Field:
                 canvas.delete(self.click_cell[0])
                 self.click_cell.pop(0)
         self.made_field()    
+    
     def draw_yellow_square(self):
         
         cell_coordinates = self.cell_coordinates[len(self.cell_coordinates)-1]
-        print(cell_coordinates)
         if cell_coordinates[0] <=2 and cell_coordinates[1]<=2:
             self.yellow_square.append(canvas.create_rectangle(50,100,200, 250, width = 1, fill = 'yellow'))
         if cell_coordinates[0] <=2 and 3<=cell_coordinates[1]<=5:
@@ -116,19 +127,46 @@ class Field:
         check_value = self.check_entered_value(num)
         if check_value:
             canvas.create_text(self.cell_size/2+ self.cell_size*cell_coordinates[1]+50, self.cell_size/2+self.cell_size*cell_coordinates[0]+100, text=num, font='Verdana 20', fill = 'green', tag = "del" )
-
+            self.task[cell_coordinates[0]][cell_coordinates[1]] = num
+            self.change_task_field()
+    
     def check_entered_value(self, num):
+        self.error_flag =0 
         cell_coordinates = self.cell_coordinates[len(self.cell_coordinates)-1]
         if self.task[cell_coordinates[0]][cell_coordinates[1]] != 0:
            return False
         if num in self.task[cell_coordinates[0]]:
-           canvas.create_text(300, 50, text="WRONG NUMBER!!!", font='Verdana 20', fill = 'red', tag = "del" )
-           return False
-        for i in self.task:
-            if i[cell_coordinates[1]]==num:
-                canvas.create_text(300, 50, text="WRONG NUMBER!!!", font='Verdana 20', fill = 'red', tag = "del" )
-                return False
+           self.error_flag =1
+        for i in range(len(self.task)):
+            if self.task[i][cell_coordinates[1]]==num:
+                self.error_flag =1
+                print(i)
+                print(cell_coordinates[0])
+                canvas.create_text(self.cell_size/2+ self.cell_size*cell_coordinates[1]+50, self.cell_size/2+self.cell_size*i+100, text=num, font='Verdana 20', fill = 'red', tag = "del" )
         
+        if cell_coordinates[0] <=2 and cell_coordinates[1]<=2 and num in self.changed_task_fields_for_check_in_square[0]:
+            self.error_flag =1
+        if cell_coordinates[0] <=2 and 3<=cell_coordinates[1]<=5 and num in self.changed_task_fields_for_check_in_square[1]:
+            self.error_flag =1
+        if cell_coordinates[0] <=2 and cell_coordinates[1] >=6 and num in self.changed_task_fields_for_check_in_square[2]:
+            self.error_flag =1
+        if 3<=cell_coordinates[0] <=5 and cell_coordinates[1]<=2 and num in self.changed_task_fields_for_check_in_square[3]:
+            self.error_flag =1
+        if 3<=cell_coordinates[0] <=5 and 3<=cell_coordinates[1]<=5 and num in self.changed_task_fields_for_check_in_square[4]:
+            self.error_flag =1    
+        if 3<=cell_coordinates[0] <=5 and cell_coordinates[1]>=6 and num in self.changed_task_fields_for_check_in_square[5]:
+            self.error_flag =1
+        if cell_coordinates[0] >=6 and cell_coordinates[1]<=2 and num in self.changed_task_fields_for_check_in_square[6]:
+            self.error_flag =1  
+        if cell_coordinates[0] >=6 and 3<=cell_coordinates[1]<=5 and num in self.changed_task_fields_for_check_in_square[7]:
+            self.error_flag =1
+        if cell_coordinates[0] >=6 and cell_coordinates[1]>=6 and num in self.changed_task_fields_for_check_in_square[8]:
+            self.error_flag =1
+        if self.error_flag ==1:
+            self.wrong_number.append(canvas.create_text(300, 50, text="WRONG NUMBER!!!", font='Verdana 20', fill = 'red', tag = "del" ))
+            print(self.wrong_number)
+            return False
+
         return True
 class Click:
     def __init__(self):
