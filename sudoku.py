@@ -2,6 +2,7 @@
 from tkinter import*
 from ast import Lambda
 import random
+from traceback import print_tb
 
 
 root =Tk()
@@ -12,10 +13,9 @@ canvas.pack()
 canvas.create_line(canv_size,5, canv_size, canv_size-5, fill = '#3f8023', width=5)
 canvas.create_rectangle(5,5, canv_size*2-5, canv_size-5,outline="#3f8023", width=5)
 
-
 class Field:
-    def __init__(self, task=None):
-        self.task = task
+    def __init__(self, task=[]):
+        self.task = task.copy()
         self.field_size = 450
         self.cell_size = 50
         self.vertical_rectangle =[]
@@ -25,6 +25,7 @@ class Field:
         self.click_cell = []
         self.changed_task_fields_for_check_in_square = [[],[],[],[],[],[],[],[],[]]
         self.wrong_number = []
+        
 
     def change_task_field(self):
         for i in range(len(self.task)):
@@ -72,7 +73,6 @@ class Field:
                     
 
     def click_event_field(self, event):
-        canvas.create_rectangle(50, 100, 500, 550, width = 1, fill = 'white')
         if len(self.wrong_number)>=1:
             canvas.delete(self.wrong_number[0])
             self.wrong_number.pop(0)
@@ -127,6 +127,8 @@ class Field:
         if check_value:
             canvas.create_text(self.cell_size/2+ self.cell_size*cell_coordinates[1]+50, self.cell_size/2+self.cell_size*cell_coordinates[0]+100, text=num, font='Verdana 20', fill = 'green', tag = "del" )
             self.task[cell_coordinates[0]][cell_coordinates[1]] = num
+            # list_of_changed_spisoks.append(self.task)
+            # print(list_of_changed_spisoks)
             self.change_task_field()
     
     def check_entered_value(self, num):
@@ -159,24 +161,52 @@ class Field:
             self.error_flag =1
             for i in range(3):
                 if num in self.task[i] and 5>=self.task[i].index(num)>=3:
-                    print("fgsdfgdf")
                     canvas.create_rectangle(self.cell_size*self.task[i].index(num)+51, self.cell_size*i+101, self.cell_size*self.task[i].index(num)+99,self.cell_size*i+149, fill = 'green')
                     self.draw_wrong_number(num, i)
 
         if cell_coordinates[0] <=2 and cell_coordinates[1] >=6 and num in self.changed_task_fields_for_check_in_square[2]:
             self.error_flag =1
+            for i in range(3):
+                if num in self.task[i] and self.task[i].index(num)>=6:
+                    canvas.create_rectangle(self.cell_size*self.task[i].index(num)+51, self.cell_size*i+101, self.cell_size*self.task[i].index(num)+99,self.cell_size*i+149, fill = 'green')
+                    self.draw_wrong_number(num, i)
         if 3<=cell_coordinates[0] <=5 and cell_coordinates[1]<=2 and num in self.changed_task_fields_for_check_in_square[3]:
             self.error_flag =1
+            for i in range(3):
+                if num in self.task[i+3] and self.task[i+3].index(num)<3:
+                    canvas.create_rectangle(self.cell_size*self.task[i+3].index(num)+51, self.cell_size*(i+3)+101, self.cell_size*self.task[i+3].index(num)+99,self.cell_size*(i+3)+149, fill = 'green')
+                    self.draw_wrong_number(num, i+3)
+
         if 3<=cell_coordinates[0] <=5 and 3<=cell_coordinates[1]<=5 and num in self.changed_task_fields_for_check_in_square[4]:
-            self.error_flag =1    
+            self.error_flag =1 
+            for i in range(3):
+                if num in self.task[i+3] and 5>=self.task[i+3].index(num)>=3:
+                    canvas.create_rectangle(self.cell_size*self.task[i+3].index(num)+51, self.cell_size*(i+3)+101, self.cell_size*self.task[i+3].index(num)+99,self.cell_size*(i+3)+149, fill = 'green')
+                    self.draw_wrong_number(num, i+3) 
         if 3<=cell_coordinates[0] <=5 and cell_coordinates[1]>=6 and num in self.changed_task_fields_for_check_in_square[5]:
             self.error_flag =1
+            for i in range(3):
+                if num in self.task[i+3] and self.task[i+3].index(num)>=6:
+                    canvas.create_rectangle(self.cell_size*self.task[i+3].index(num)+51, self.cell_size*(i+3)+101, self.cell_size*self.task[i+3].index(num)+99,self.cell_size*(i+3)+149, fill = 'green')
+                    self.draw_wrong_number(num, i+3) 
         if cell_coordinates[0] >=6 and cell_coordinates[1]<=2 and num in self.changed_task_fields_for_check_in_square[6]:
             self.error_flag =1  
+            for i in range(3):
+                if num in self.task[i+6] and self.task[i+6].index(num)<3:
+                    canvas.create_rectangle(self.cell_size*self.task[i+6].index(num)+51, self.cell_size*(i+6)+101, self.cell_size*self.task[i+6].index(num)+99,self.cell_size*(i+6)+149, fill = 'green')
+                    self.draw_wrong_number(num, i+6)
         if cell_coordinates[0] >=6 and 3<=cell_coordinates[1]<=5 and num in self.changed_task_fields_for_check_in_square[7]:
             self.error_flag =1
+            for i in range(3):
+                if num in self.task[i+6] and 5>=self.task[i+6].index(num)>=3:
+                    canvas.create_rectangle(self.cell_size*self.task[i+6].index(num)+51, self.cell_size*(i+6)+101, self.cell_size*self.task[i+6].index(num)+99,self.cell_size*(i+6)+149, fill = 'green')
+                    self.draw_wrong_number(num, i+6)
         if cell_coordinates[0] >=6 and cell_coordinates[1]>=6 and num in self.changed_task_fields_for_check_in_square[8]:
             self.error_flag =1
+            for i in range(3):
+                if num in self.task[i+6] and self.task[i+6].index(num)>=6:
+                    canvas.create_rectangle(self.cell_size*self.task[i+6].index(num)+51, self.cell_size*(i+6)+101, self.cell_size*self.task[i+6].index(num)+99,self.cell_size*(i+6)+149, fill = 'green')
+                    self.draw_wrong_number(num, i+6)
 
         if self.error_flag ==1:
             self.wrong_number.append(canvas.create_text(300, 50, text="WRONG NUMBER!!!", font='Verdana 20', fill = 'red', tag = "del" ))
@@ -195,19 +225,32 @@ class Click:
     def __init__(self):
         self.clear_flag = 0
         self.field = Field()
+        self.random_arg = 0
     def click_handler(self, event):
-            random_arg = 0
             clear_field = Field(spisok_empty)
             if event == "new game":
+                canvas.create_rectangle(50, 100, 500, 550, width = 1, fill = 'white')
                 clear_field.made_field()
-                random_arg = random.randint(0, len(spisok)-1)
-                self.field =  Field((spisok[random_arg]))
+                self.random_arg = random.randint(0, len(spisok)-1)
+                print(self.random_arg)
+                self.field =  Field(spisok[self.random_arg])
                 self.field.made_field()
                 self.clear_flag = 1
 
             if event == "clear" and self.clear_flag ==1:
+                canvas.create_rectangle(50, 100, 500, 550, width = 1, fill = 'white')
                 clear_field.made_field()
+                self.field = Field(spisok[self.random_arg])
+                print(self.random_arg)
+                print(spisok)
                 self.field.made_field()
+            if event == "cancel"  and self.clear_flag ==1:
+                canvas.create_rectangle(50, 100, 500, 550, width = 1, fill = 'white')
+                clear_field.made_field()
+                # self.field = Field(list_of_changed_spisoks[len(list_of_changed_spisoks)-1])
+                # if len(list_of_changed_spisoks)>1:
+                #     list_of_changed_spisoks.pop(len(list_of_changed_spisoks)-1)
+                # self.field.made_field()
             
             if type(event) == int:
                 self.field.write_number_in_cell(event)
