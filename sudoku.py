@@ -74,6 +74,10 @@ class Field:
 
     def click_event_field(self, event):
         if len(self.wrong_number)>=1:
+            canvas.create_rectangle(50, 100, 500, 550, width = 1, fill = 'white')
+            clear_field = Field(spisok_empty)
+            clear_field.made_field()
+            self.made_field()
             canvas.delete(self.wrong_number[0])
             self.wrong_number.pop(0)
         self.cell_coordinates.append(self.change_coords(event.x, event.y))
@@ -127,8 +131,6 @@ class Field:
         if check_value:
             canvas.create_text(self.cell_size/2+ self.cell_size*cell_coordinates[1]+50, self.cell_size/2+self.cell_size*cell_coordinates[0]+100, text=num, font='Verdana 20', fill = 'green', tag = "del" )
             self.task[cell_coordinates[0]][cell_coordinates[1]] = num
-            # list_of_changed_spisoks.append(self.task)
-            # print(list_of_changed_spisoks)
             self.change_task_field()
     
     def check_entered_value(self, num):
@@ -254,7 +256,6 @@ class Click:
             
             if type(event) == int:
                 self.field.write_number_in_cell(event)
-            
             canvas.bind('<Button-1>', self.field.click_event_field)    
 
 spisok = [[[1,0,0,0,0,0,0,0,3], 
