@@ -3,6 +3,7 @@ from tkinter import*
 from ast import Lambda
 import random
 from traceback import print_tb
+import copy
 
 
 root =Tk()
@@ -224,7 +225,9 @@ class Field:
         canvas.create_line(53+self.cell_size*cell_coordinates[1],147+self.cell_size*cell_coordinates[0],99+self.cell_size*cell_coordinates[1],101+self.cell_size*cell_coordinates[0], width = 2, fill = 'red')
 
 class Click:
-    def __init__(self):
+    def __init__(self, spisok, spisok2):
+        self.spisok = spisok 
+        self.spisok2 = spisok2
         self.clear_flag = 0
         self.field = Field()
         self.random_arg = 0
@@ -233,18 +236,17 @@ class Click:
             if event == "new game":
                 canvas.create_rectangle(50, 100, 500, 550, width = 1, fill = 'white')
                 clear_field.made_field()
-                self.random_arg = random.randint(0, len(spisok)-1)
+                self.random_arg = random.randint(0, len(self.spisok)-1)
                 print(self.random_arg)
-                self.field =  Field(spisok[self.random_arg])
+                self.field =  Field(self.spisok[self.random_arg])
                 self.field.made_field()
                 self.clear_flag = 1
 
             if event == "clear" and self.clear_flag ==1:
                 canvas.create_rectangle(50, 100, 500, 550, width = 1, fill = 'white')
                 clear_field.made_field()
-                self.field = Field(spisok[self.random_arg])
-                print(self.random_arg)
-                print(spisok)
+                self.spisok = copy.deepcopy(self.spisok2)
+                self.field = Field(self.spisok[self.random_arg])
                 self.field.made_field()
             if event == "cancel"  and self.clear_flag ==1:
                 canvas.create_rectangle(50, 100, 500, 550, width = 1, fill = 'white')
@@ -304,6 +306,8 @@ spisok = [[[1,0,0,0,0,0,0,0,3],
           [0,0,0,0,0,0,7,0,2],
           [9,0,0,0,7,5,4,0,8]]]
 
+spisok2 = copy.deepcopy(spisok)
+
 spisok_empty = [[0,0,0,0,0,0,0,0,0], 
                 [0,0,0,0,0,0,0,0,0], 
                 [0,0,0,0,0,0,0,0,0],
@@ -314,7 +318,7 @@ spisok_empty = [[0,0,0,0,0,0,0,0,0],
                 [0,0,0,0,0,0,0,0,0],
                 [0,0,0,0,0,0,0,0,0]]
 
-click = Click()
+click = Click(spisok, spisok2)
 btn_new_game = Button(text="New game", background="#2a7098", foreground="white", font=("Arial", 23, "bold"), command=lambda: click.click_handler("new game"))
 btn_new_game.place(x=700, y=100,  height=50, width=450, bordermode=INSIDE)
 btn_cancel = Button(text="Cancel", background="#2a7098", foreground="white", font=("Arial", 23, "bold"), command=lambda: click.click_handler("cancel"))
